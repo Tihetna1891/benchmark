@@ -188,32 +188,90 @@ def collapsible_table(title, dataframe):
 
 #         group_dfs[group] = group_df
 #     return group_dfs
+# def calculate_min_prices(data, selected_date_range, selected_product, location_groups):
+#     data['Timestamp'] = pd.to_datetime(data['Timestamp']).dt.normalize() # Normaliztion Timestamp 
+#     product_data = data[(data['Products List'] == selected_product) &
+#                         (data['Timestamp'] >= pd.to_datetime(selected_date_range[0])) &
+#                         (data['Timestamp'] <= pd.to_datetime(selected_date_range[1]))]
+#     product_data.columns = product_data.columns.str.strip()
+#     # st.write(product_data.columns)
+#     if 'Farm Source Type' not in product_data.columns:
+#         raise ValueError("'Farm Source Type' column not found in the dataset")
+
+#     if product_data.empty:
+#         return {group: pd.DataFrame() for group in location_groups}
+
+#     date_range = pd.date_range(start=selected_date_range[0], end=selected_date_range[1])
+#     group_dfs = {}
+#     for group, locations in location_groups.items():
+#         if group == 'Farm':
+#             metrics = ['Avg_Price', 'Min_Price', 'Min_Location', 'Farm_Source_Type']
+#         else:
+#             metrics = ['Avg_Price', 'Min_Price', 'Min_Location']
+#         # metrics = ['Avg_Price', 'Min_Price', 'Min_Location']
+#         # if group == 'Farm':
+#         #     metrics.append('Farm_Source_Type')
+#         # metrics = ['Avg_Price', 'Min_Price', 'Min_Location']
+#         multi_index = pd.MultiIndex.from_tuples([(group, metric) for metric in metrics], names=['Group', 'Metric'])
+#         group_df = pd.DataFrame(index=multi_index, columns=date_range)
+#         for date in date_range:
+#             day_data = product_data[(product_data['Timestamp'] == date) & 
+#                                     (product_data['Location'].isin(locations))]
+#             if not day_data.empty:
+#                 group_df.loc[(group, 'Avg_Price'), date] = day_data['Unit Price'].mean()
+#                 group_df.loc[(group, 'Min_Price'), date] = day_data['Unit Price'].min()
+#                 min_location = day_data.loc[day_data['Unit Price'].idxmin(), 'Location']
+#                 group_df.loc[(group, 'Min_Location'), date] = min_location
+#                 if group == 'Farm':
+#                     farm_source_types = day_data['Farm Source Type'].unique()
+#                     group_df.loc[(group, 'Farm_Source_Type'), date] = ', '.join(farm_source_types)
+
+
+#         group_dfs[group] = group_df
+        
+#     return group_dfs
+#added to solve Failed to Calculate min prices: sequence item 0: expected str instance, float found
 def calculate_min_prices(data, selected_date_range, selected_product, location_groups):
-    data['Timestamp'] = pd.to_datetime(data['Timestamp']).dt.normalize() # Normaliztion Timestamp 
+    # Ensure data is not empty
+    if data is None or data.empty:
+        return {group: pd.DataFrame() for group in location_groups}
+
+    # Normalize Timestamp column
+    data['Timestamp'] = pd.to_datetime(data['Timestamp']).dt.normalize()
+    
+    # Filter product data
     product_data = data[(data['Products List'] == selected_product) &
                         (data['Timestamp'] >= pd.to_datetime(selected_date_range[0])) &
                         (data['Timestamp'] <= pd.to_datetime(selected_date_range[1]))]
+    
+    # Strip any extra spaces from column names
     product_data.columns = product_data.columns.str.strip()
-    # st.write(product_data.columns)
-    if 'Farm Source Type' not in product_data.columns:
-        raise ValueError("'Farm Source Type' column not found in the dataset")
+    
+    # Check for required columns
+    required_columns = ['Products List', 'Timestamp', 'Unit Price', 'Location']
+    if 'Farm Source Type' in location_groups.get('Farm', []):
+        required_columns.append('Farm Source Type')
 
+    missing_columns = [col for col in required_columns if col not in product_data.columns]
+    if missing_columns:
+        raise ValueError(f"Missing columns in dataset: {', '.join(missing_columns)}")
+
+    # If no data for the selected product, return empty DataFrames
     if product_data.empty:
         return {group: pd.DataFrame() for group in location_groups}
 
     date_range = pd.date_range(start=selected_date_range[0], end=selected_date_range[1])
     group_dfs = {}
+
     for group, locations in location_groups.items():
         if group == 'Farm':
             metrics = ['Avg_Price', 'Min_Price', 'Min_Location', 'Farm_Source_Type']
         else:
             metrics = ['Avg_Price', 'Min_Price', 'Min_Location']
-        # metrics = ['Avg_Price', 'Min_Price', 'Min_Location']
-        # if group == 'Farm':
-        #     metrics.append('Farm_Source_Type')
-        # metrics = ['Avg_Price', 'Min_Price', 'Min_Location']
+        
         multi_index = pd.MultiIndex.from_tuples([(group, metric) for metric in metrics], names=['Group', 'Metric'])
         group_df = pd.DataFrame(index=multi_index, columns=date_range)
+        
         for date in date_range:
             day_data = product_data[(product_data['Timestamp'] == date) & 
                                     (product_data['Location'].isin(locations))]
@@ -223,12 +281,15 @@ def calculate_min_prices(data, selected_date_range, selected_product, location_g
                 min_location = day_data.loc[day_data['Unit Price'].idxmin(), 'Location']
                 group_df.loc[(group, 'Min_Location'), date] = min_location
                 if group == 'Farm':
-                    farm_source_types = day_data['Farm Source Type'].unique()
+                    # Convert farm source types to string before joining
+                    farm_source_types = day_data['Farm Source Type'].astype(str).unique()
+                    # Ensure all source types are strings
+                    farm_source_types = [str(type) for type in farm_source_types]
+                    # Join source types into a single string
                     group_df.loc[(group, 'Farm_Source_Type'), date] = ', '.join(farm_source_types)
-
-
-        group_dfs[group] = group_df
         
+        group_dfs[group] = group_df
+    
     return group_dfs
 
 def calculate_prices_by_location(data, selected_date_range, selected_product, location_groups):
