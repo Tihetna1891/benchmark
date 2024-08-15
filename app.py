@@ -118,7 +118,7 @@ csv_files = {
     # 'volume': 'path/to/volume.csv'
 }
 
-data_frames = {}
+# data_frames = {}
 with ThreadPoolExecutor() as executor:
     future_to_file = {executor.submit(fetch_data_from_csv, csv_files[key]): key for key in csv_files}
     for future in as_completed(future_to_file):
