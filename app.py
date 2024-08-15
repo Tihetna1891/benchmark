@@ -41,11 +41,11 @@ def fetch_google_sheet_csv(url):
         st.error(f"Error fetching data: {e}")
         return None
 
-st.set_page_config(layout="wide")
+# st.set_page_config(layout="wide")
 
-st.title("ChipChip Product Pricing")
+# st.title("ChipChip Product Pricing")
 
-st.sidebar.markdown("Select filters to visualize the dashboard")
+# st.sidebar.markdown("Select filters to visualize the dashboard")
 
 def fetch_data(sheet_name, worksheet_name):
     try:
