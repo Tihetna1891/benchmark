@@ -114,8 +114,8 @@ csv_files = {
     'Localshops': 'data/chip - Localshops.csv',
     'Distribution': 'data/chip - Distribution.csv',
     'Farm_': 'data/chip - Farm_.csv'
-    # 'chip_prices': 'path/to/chip_prices.csv',
-    # 'volume': 'path/to/volume.csv'
+    'chip_prices': 'path/to/chip_prices.csv',
+    'volume': 'path/to/volume.csv'
 }
 
 data_frames = {}
