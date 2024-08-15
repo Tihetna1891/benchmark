@@ -110,10 +110,10 @@ def fetch_data_from_csv(file_path):
 
 # List of CSV file paths (you can replace these with the actual paths to your CSV files)
 csv_files = {
-    'sunday': 'data/chip - sunday.csv',
-    'Localshops': 'data/chip - Localshops.csv',
-    'Distribution': 'data/chip - Distribution.csv',
-    'Farm_': 'data/chip - Farm_.csv'
+    'sunday': 'chip - sunday.csv',
+    'Localshops': 'chip - Localshops.csv',
+    'Distribution': 'chip - Distribution.csv',
+    'Farm_': 'chip - Farm_.csv'
     # 'chip_prices': 'path/to/chip_prices.csv',
     # 'volume': 'path/to/volume.csv'
 }
