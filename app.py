@@ -31,48 +31,48 @@ def filter_df_by_date_and_products(df, selected_date_range, selected_products):
     filtered_df = df[mask_date & mask_products]
     return filtered_df
 
-# def fetch_google_sheet_csv(url):
-#     try:
-#         response = requests.get(url)
-#         response.raise_for_status()  # Raise an HTTPError for bad responses
-#         csv_data = response.content.decode('utf-8')
-#         return csv_data
-#     except requests.exceptions.RequestException as e:
-#         st.error(f"Error fetching data: {e}")
-#         return None
+def fetch_google_sheet_csv(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+        csv_data = response.content.decode('utf-8')
+        return csv_data
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching data: {e}")
+        return None
 
-# st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")
 
-# st.title("ChipChip Product Pricing")
+st.title("ChipChip Product Pricing")
 
-# st.sidebar.markdown("Select filters to visualize the dashboard")
+st.sidebar.markdown("Select filters to visualize the dashboard")
 
-# def fetch_data(sheet_name, worksheet_name):
-#     try:
-#         return read_gsheet_to_df(sheet_name, worksheet_name)
-#     except Exception as e:
-#         st.error(f"Failed to load {worksheet_name} into DataFrame: {e}")
-#         return None
+def fetch_data(sheet_name, worksheet_name):
+    try:
+        return read_gsheet_to_df(sheet_name, worksheet_name)
+    except Exception as e:
+        st.error(f"Failed to load {worksheet_name} into DataFrame: {e}")
+        return None
 
-# sheets_and_worksheets = [
-#     ('chip', 'sunday'),
-#     ('chip', 'Localshops'),
-#     ('chip', 'Distribution'),
-#     ('chip', 'Farm_'),
-#     ('chip', 'chip_prices'),
-#     ('chip', 'volume')
-# ]
+sheets_and_worksheets = [
+    # ('chip', 'sunday'),
+    # ('chip', 'Localshops'),
+    # ('chip', 'Distribution'),
+    # ('chip', 'Farm_'),
+    ('chip', 'chip_prices'),
+    ('chip', 'volume')
+]
 
-# # Fetch data concurrently
-# data_frames = {}
-# with ThreadPoolExecutor() as executor:
-#     future_to_sheet = {executor.submit(fetch_data, sheet, worksheet): worksheet for sheet, worksheet in sheets_and_worksheets}
-#     for future in as_completed(future_to_sheet):
-#         worksheet_name = future_to_sheet[future]
-#         try:
-#             data_frames[worksheet_name] = future.result()
-#         except Exception as e:
-#             st.error(f"Failed to load data from {worksheet_name}: {e}")
+# Fetch data concurrently
+data_frames = {}
+with ThreadPoolExecutor() as executor:
+    future_to_sheet = {executor.submit(fetch_data, sheet, worksheet): worksheet for sheet, worksheet in sheets_and_worksheets}
+    for future in as_completed(future_to_sheet):
+        worksheet_name = future_to_sheet[future]
+        try:
+            data_frames[worksheet_name] = future.result()
+        except Exception as e:
+            st.error(f"Failed to load data from {worksheet_name}: {e}")
 
 # try:
 #     survey_0 = data_frames.get('sunday')
