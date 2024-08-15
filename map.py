@@ -5,59 +5,59 @@ import altair as alt
 import re
 import numpy as np
 from io import StringIO
-# from google.oauth2.service_account import Credentials
+from google.oauth2.service_account import Credentials
 import json 
 from datetime import datetime, timedelta
 import gspread
 import numpy as np
 import _thread
 import weakref
-# from gspread_dataframe import set_with_dataframe
+from gspread_dataframe import set_with_dataframe
 
-# credentials_info = {
-#         "type": st.secrets["google_credentials"]["type"],
-#         "project_id": st.secrets["google_credentials"]["project_id"],
-#         "private_key_id": st.secrets["google_credentials"]["private_key_id"],
-#         "private_key": st.secrets["google_credentials"]["private_key"],
-#         "client_email": st.secrets["google_credentials"]["client_email"],
-#         "client_id": st.secrets["google_credentials"]["client_id"],
-#         "auth_uri": st.secrets["google_credentials"]["auth_uri"],
-#         "token_uri": st.secrets["google_credentials"]["token_uri"],
-#         "auth_provider_x509_cert_url": st.secrets["google_credentials"]["auth_provider_x509_cert_url"],
-#         "client_x509_cert_url": st.secrets["google_credentials"]["client_x509_cert_url"]
-#     }
+credentials_info = {
+        "type": st.secrets["google_credentials"]["type"],
+        "project_id": st.secrets["google_credentials"]["project_id"],
+        "private_key_id": st.secrets["google_credentials"]["private_key_id"],
+        "private_key": st.secrets["google_credentials"]["private_key"],
+        "client_email": st.secrets["google_credentials"]["client_email"],
+        "client_id": st.secrets["google_credentials"]["client_id"],
+        "auth_uri": st.secrets["google_credentials"]["auth_uri"],
+        "token_uri": st.secrets["google_credentials"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["google_credentials"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["google_credentials"]["client_x509_cert_url"]
+    }
 
-# scope = [
-#         'https://www.googleapis.com/auth/spreadsheets',
-#         'https://www.googleapis.com/auth/drive'
-#     ]
+scope = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
 
-# credentials = Credentials.from_service_account_info(credentials_info, scopes=scope)
+credentials = Credentials.from_service_account_info(credentials_info, scopes=scope)
 
-# client = gspread.authorize(credentials)
-# def no_op_hash(obj):
-#     return str(obj)
-# def weak_method_hash(obj):
-#     return str(obj)
+client = gspread.authorize(credentials)
+def no_op_hash(obj):
+    return str(obj)
+def weak_method_hash(obj):
+    return str(obj)
 
-# @st.cache_data(hash_funcs={_thread.RLock: no_op_hash, weakref.WeakMethod: weak_method_hash})
-# def read_gsheet_to_df(sheet_name, worksheet_name):
+@st.cache_data(hash_funcs={_thread.RLock: no_op_hash, weakref.WeakMethod: weak_method_hash})
+def read_gsheet_to_df(sheet_name, worksheet_name):
     
-#     try:
-#         spreadsheet = client.open(sheet_name)
-#     except gspread.exceptions.SpreadsheetNotFound:
-#         st.error(f"Spreadsheet '{sheet_name}' not found.")
-#         return None
+    try:
+        spreadsheet = client.open(sheet_name)
+    except gspread.exceptions.SpreadsheetNotFound:
+        st.error(f"Spreadsheet '{sheet_name}' not found.")
+        return None
 
-#     try:
-#         worksheet = spreadsheet.worksheet(worksheet_name)
-#     except gspread.exceptions.WorksheetNotFound:
-#         st.error(f"Worksheet '{worksheet_name}' not found in spreadsheet '{sheet_name}'.")
-#         return None
+    try:
+        worksheet = spreadsheet.worksheet(worksheet_name)
+    except gspread.exceptions.WorksheetNotFound:
+        st.error(f"Worksheet '{worksheet_name}' not found in spreadsheet '{sheet_name}'.")
+        return None
 
-#     data = worksheet.get_all_records()
-#     df = pd.DataFrame(data)
-#     return df
+    data = worksheet.get_all_records()
+    df = pd.DataFrame(data)
+    return df
 def visualize_price_by_location(df, selected_date_range, selected_product, selected_locations): 
     start_date, end_date = selected_date_range 
     start_date = pd.to_datetime(start_date) 
